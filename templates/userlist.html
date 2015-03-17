@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<div>
+		<button type="button" class="btn btn-default" data-toggle="modal" data-target="#add_modal"
+			onclick="addUser()">
+			添加
+		</button>
+	</div>
+	<table class="table table-striped table-hover">
+		<tr>
+			<td>用户名</td>
+			<td>真实姓名</td>
+			<td>性别</td>
+			<td>邮箱</td>
+			<td>操作</td>
+		</tr>
+		{% for item in model %}
+		<tr>
+			<td class="hide">{{ item.uid }}</td>
+			<td><a href="/userdetail/{{ item.uid }}">{{ item.username }}</a></td>
+			<td>{{ item.realName }}</td>
+			<td>{% ifequal item.gender 0 %}
+					男
+				{% else %}
+					{% ifequal item.gender 1 %}
+						女
+					{% else %}
+						保密
+					{% endifequal %}
+				{% endifequal %}
+			</td>
+			<td>{{ item.email }}</td>
+			<td>
+				<a data-toggle="modal" data-target="#add_modal" class="label label-success"
+					onclick="editUser(this)">编辑</a>
+				<a data-toggle="modal" data-target="#del_modal" class="label label-warning"
+					onclick="editUser(this)">删除</a>
+			</td>
+		</tr>
+	{% endfor %}
+	</table>
+
+	<!--添加/编辑层开始-->
+	<div class="modal fade" id="add_modal" role="dialog">
+	  <div class="modal-dialog">
+		<div class="modal-content">
+		  <div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+			<h4 class="modal-title">提示</h4>
+		  </div>
+		  <div class="modal-body">
+			<form id="add_form" class="form" method="post" action="/adduser/">
+				{% csrf_token %}
+
+				<input type="hidden" id="uid" name="uid">
+
+				<div class="form-group">
+					<label for="username">用户名</label>
+					<input type="text" name="username" class="form-control" id="username" placeholder="Enter Username" required>
+				</div>
+
+				<div class="form-group">
+					<label for="name">姓名</label>
+					<input type="text" class="form-control" id="name" name="name" placeholder="Enter Realname" required>
+				</div>
+
+				<div class="form-group">
+					<label for="gender">性别</label>
+					<select id="gender" name="gender" class="form-control">
+						<option value="null" text="保密">保密</option>
+						<option value="0" text="男">男</option>
+						<option value="1" text="女">女</option>
+					</select>
+				</div>
+
+				<div class="form-group">
+					<label for="email">邮箱</label>
+					<input type="email" class="form-control" id="email" name="email" placeholder="Enter Email" required>
+				</div>
+
+				<div class="modal-footer">
+					<input type="submit" value="确认" class="btn btn-default">
+					<button type="button" class="btn btn-primary" data-dismiss="modal">关闭</button>
+				</div>
+
+			</form>
+		  </div>
+
+		</div><!-- /.modal-content -->
+	  </div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+	<!--添加/编辑层结束-->
+
+	<!--删除层开始-->
+	<div class="modal fade" id="del_modal" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title">提示</h4>
+				</div>
+				<div class="modal-body">
+					<form id="del_form" action="/deluser/" method="post">
+						{% csrf_token %}
+						<input type="hidden" id="deluid" name="deluid">
+						<p>确定要删除吗?</p>
+						<div class="modal-footer">
+							<input type="submit" class="btn btn-default" value="确定">
+							<button type="button" class="btn btn-primary" data-dismiss="modal">取消</button>
+						</div>
+					</form>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+	<!--删除层结束-->
+
+{% endblock %}
+
+{% block javascript %}
+	<script type="text/javascript">
+		function addUser(){
+			$('#add_form :input,select').val(null)
+			}
+		function delUser(arg){
+			var data = [];
+			var others = $(arg).parent().prevAll();
+			$.each(others, function (k,v) {
+				data.push($(v).text());
+			});
+			data = data.reverse();
+			$('#deluid').val(data[0])
+		}
+	function editUser(arg){
+			var data = [];
+			var others = $(arg).parent().prevAll();
+			$.each(others, function (k,v) {
+				data.push($(v).text());
+			});
+			data = data.reverse();
+			$('#uid').val(data[0]);
+			$('#username').val(data[1]);
+			$('#name').val(data[2]);
+			$("#gender option[text='" + data[3].trim() + "']").attr("selected", true);
+			$('#email').val(data[4]);
+		}
+	</script>
+{% endblock %}

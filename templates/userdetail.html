@@ -1,0 +1,32 @@
+{% extends  'base.html'%}
+
+{% block content %}
+	<div class="col-md-4 col-md-4">
+		<table class="table table-bordered table-striped">
+			<tr>
+				<th>用户名</th>
+				<td>{{key1.username}}</td>
+			</tr>
+			<tr>
+				<th>姓名</th>
+				<td>{{key1.realName}}</td>
+			</tr>
+			<tr>
+				<th>性别</th>
+				<td>{% ifequal key1.gender 1 %}
+					男
+			   {% else %}
+				   {% ifequal key1.gender 0 %}
+						女
+				   {% else %}
+						null
+				   {% endifequal %}
+				{% endifequal %}</td>
+			</tr>
+			<tr>
+				<th>邮箱</th>
+				<td>{{key1.email}}</td>
+			</tr>
+		</table>
+	</div>
+{% endblock%}
